@@ -1,6 +1,3 @@
-#!/usr/bin/python
-#coding: utf-8
-
 import os 
 import time
 import signal
@@ -33,20 +30,26 @@ def complete(array):
 	readline.parse_and_bind("tab:complete")
 
 def getPID():
-  os.system(f"ps | grep zsh > {home}/.pirate/PID")
-  fp = open(f"{home}/.pirate/PID", "r").readlines()[0]
+  os.system(f"ps | grep zsh > {home}/.shell-lock/PID")
+  fp = open(f"{home}/.shell-lock/PID", "r").readlines()[0]
   PID = fp.strip().split(" ")[0]
   return PID
     
 def checkAgent():
-  if os.path.exists(f"{home}/.pirate/.user"):
+  if os.path.exists(f"{home}/.shell-lock/.user"):
+    return True
+  else:
+    return False
+    
+def checkSession():
+  if os.path.exists(f"{home}/.shell-lock/pirate_session-{sha256(str(datetime.now().strftime("%H")).encode()).hexdigest()}"):
     return True
   else:
     return False
     
 def getDataAgent():
-  if os.path.exists(f"{home}/.pirate/.user"):
-    return open(f"{home}/.pirate/.user", "r").read()
+  if os.path.exists(f"{home}/.shell-lock/.user"):
+    return open(f"{home}/.shell-lock/.user", "r").read()
   else:
     return "None"
     
@@ -60,36 +63,39 @@ def main():
   PID = getPID()
   attempt = 3
   if checkAgent():
-    while True:
-      try:
-        if attempt == 0:
-          os.system(f"kill -9 {PID}")
-        signal.signal(signal.SIGTSTP, handler)
-        print("                    System")
-        print("                --------------")
-        print("Welcome back, Agent. Please log in to continue.")
-        print()
-        username = str(input("[?] Username: "))
-        password = pwinput(prompt="[?] Password: ", mask="*")
-        attempt -= 1
-        if getDataAgent() == sha256(str(f"{username}:{password}").encode()).hexdigest():
+    if checkSession():
+      os.system("clear")
+    else:
+      while True:
+        try:
+          if attempt == 0:
+            os.system(f"kill -9 {PID}")
+          signal.signal(signal.SIGTSTP, handler)
+          print("                    System")
+          print("                --------------")
+          print("Welcome back, Agent. Please log in to continue.")
           print()
-          print("[*] Access Granted")
-          time.sleep(2)
-          os.system("clear")
-          break
-        else:
-          print(f"[!] Access Denied, Wrong Password, remaining {attempt} attempts")
-          time.sleep(2)
-          os.system("clear")
-      except KeyboardInterrupt:
-        print()
-        print("[!] Access Denied")
-        os.system(f"kill -9 {PID}")
-      except EOFError:
-        print()
-        print("[!] Access Denied")
-        os.system(f"kill -9 {PID}")
+          username = str(input("[?] Username: "))
+          password = pwinput(prompt="[?] Password: ", mask="*")
+          attempt -= 1
+          if getDataAgent() == sha256(str(f"{username}:{password}").encode()).hexdigest():
+            print()
+            print("[*] Access Granted")
+            time.sleep(2)
+            os.system("clear")
+            break
+          else:
+            print(f"[!] Access Denied, Wrong Password, remaining {attempt} attempts")
+            time.sleep(2)
+            os.system("clear")
+        except KeyboardInterrupt:
+          print()
+          print("[!] Access Denied")
+          os.system(f"kill -9 {PID}")
+        except EOFError:
+          print()
+          print("[!] Access Denied")
+          os.system(f"kill -9 {PID}")
   else:
     print("                  System")
     print("              --------------")
@@ -97,7 +103,7 @@ def main():
     print()
     newUsername = str(input("[?] New Username: "))
     newPassword = pwinput(prompt="[?] New Password: ", mask="*")
-    with open(f"{home}/.pirate/.user", "w") as fu:
+    with open(f"{home}/.shell-lock/.user", "w") as fu:
       fu.write(sha256(str(f"{newUsername}:{newPassword}").encode()).hexdigest())
       fu.close()
       print()
