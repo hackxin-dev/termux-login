@@ -146,8 +146,6 @@ else
   printf "    ${FMT_CYAN}Collecting colorama ...${FMT_RESET}\n"
   sleep 1
   pip install colorama | grep anonymous
-  
-  
 fi
 
 
