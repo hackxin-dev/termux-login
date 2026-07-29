@@ -79,6 +79,7 @@ def main():
           password = pwinput(prompt="[?] Password: ", mask="*")
           attempt -= 1
           if getDataAgent() == sha256(str(f"{username}:{password}").encode()).hexdigest():
+            open(f"{home}/.shell-lock/pirate_session-{sha256(str(datetime.now().strftime('%H')).encode()).hexdigest()}", "w").write(sha256(str(f"{username}:{password}").encode()).hexdigest())
             print()
             print("[*] Access Granted")
             time.sleep(2)
