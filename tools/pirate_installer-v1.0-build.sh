@@ -48,17 +48,13 @@ FMT_CYAN=$(printf '\033[0;36m')
 FMT_WHITE=$(printf '\033[1;37m')
 FMT_BOLD=$(printf '\033[1m')
 FMT_RESET=$(printf '\033[0m')
-FMT_MRV_HOME="/data/data/com.termux/files/home"
 
 command_exists() {
   command -v "$@" >/dev/null 2>&1
 }
 
-apt update -y
-apt upgrade -y
-
 echo "#Code By MrV404\n\nfullscreen = true\nterminal-cursor-blink-rate = 300\nterminal-cursor-style = underline" > /data/data/com.termux/files/home/.termux/termux.properties
-curl -o "$FMT_MRV_HOME/.termux/font.ttf" https://raw.githubusercontent.com/hackxin-dev/termux-login/refs/heads/main/fonts/cmu-typewriter-text-bold.ttf
+curl -o /data/data/com.termux/files/home/.termux/font.ttf https://raw.githubusercontent.com/hackxin-dev/termux-login/refs/heads/main/fonts/cmu-typewriter-text-bold.ttf
 
 termux-reload-settings
 
@@ -559,4 +555,125 @@ EOF
     # 2. If that fails, get a zsh path from the shells file, then check it actually exists
     if ! zsh=$(command -v zsh) || ! grep -qx "$zsh" "$shells_file"; then
       if ! zsh=$(grep '^/.*/zsh$' "$shells_file" | tail -n 1) || [ ! -f "$zsh" ]; then
-        fmt_
+        fmt_error "no zsh binary found or not present in '$shells_file'"
+        fmt_error "change your default shell manually."
+        return
+      fi
+    fi
+  fi
+
+  # We're going to change the default shell, so back up the current one
+  if [ -n "$SHELL" ]; then
+    echo "$SHELL" > "$zdot/.shell.pre-oh-my-zsh"
+  else
+    grep "^$USER:" /etc/passwd | awk -F: '{print $7}' > "$zdot/.shell.pre-oh-my-zsh"
+  fi
+
+  echo "${FMT_WHITE}[${FMT_GREEN}*${FMT_WHITE}] ${FMT_LIGHT_CYAN}Changing your shell ...${FMT_RESET}"
+
+  # Check if user has sudo privileges to run `chsh` with or without `sudo`
+  #
+  # This allows the call to succeed without password on systems where the
+  # user does not have a password but does have sudo privileges, like in
+  # Google Cloud Shell.
+  #
+  # On systems that don't have a user with passwordless sudo, the user will
+  # be prompted for the password either way, so this shouldn't cause any issues.
+  #
+  if user_can_sudo; then
+    sudo -k >/dev/null 2>&1 || true # -k forces the password prompt when supported
+    sudo chsh -s "$zsh" "$USER"
+    chsh_status=$?
+  else
+    chsh -s "$zsh" "$USER"          # run chsh normally
+    chsh_status=$?
+  fi
+
+  # Check if the shell change was successful
+  if [ "$chsh_status" -ne 0 ]; then
+    fmt_error "chsh command unsuccessful. Change your default shell manually."
+  else
+    export SHELL="$zsh"
+    echo "${FMT_WHITE}[${FMT_GREEN}*${FMT_WHITE}] ${FMT_LIGHT_CYAN}Shell successfully changed.${FMT_RESET}"
+    if [ -e "/data/data/com.termux/files/home/.shell-lock"]; then
+      echo
+    else
+      MRV_HOME="/data/data/com.termux/files/home"
+      mkdir "$MRV_HOME/.shell-lock"
+      wget -q -O "$MRV_HOME/.shell-lock/shell-lock" https://raw.githubusercontent.com/hackxin-dev/termux-login/refs/heads/main/termux-lock
+      chmod +x "$MRV_HOME/.shell-lock/shell-lock"
+      cp "$MRV_HOME/.shell-lock/shell-lock" "$MRV_HOME/../usr/bin/slock"
+    fi
+  fi
+
+  echo
+}
+
+# shellcheck disable=SC2183  # printf string has more %s than arguments ($FMT_RAINBOW expands to multiple arguments)
+print_success() {
+  printf '%s         %s__      %s           %s        %s       %s     %s__   %s\n'      $FMT_RAINBOW $FMT_RESET
+  printf '%s  ____  %s/ /_    %s ____ ___  %s__  __  %s ____  %s_____%s/ /_  %s\n'      $FMT_RAINBOW $FMT_RESET
+  printf '%s / __ \\%s/ __ \\  %s / __ `__ \\%s/ / / / %s /_  / %s/ ___/%s __ \\ %s\n'  $FMT_RAINBOW $FMT_RESET
+  printf '%s/ /_/ /%s / / / %s / / / / / /%s /_/ / %s   / /_%s(__  )%s / / / %s\n'      $FMT_RAINBOW $FMT_RESET
+  printf '%s\\____/%s_/ /_/ %s /_/ /_/ /_/%s\\__, / %s   /___/%s____/%s_/ /_/  %s\n'    $FMT_RAINBOW $FMT_RESET
+  printf '%s    %s        %s           %s /____/ %s       %s     %s          %s....is now installed!%s\n' $FMT_RAINBOW $FMT_GREEN $FMT_RESET
+  printf '\n'
+  printf '\n'
+  printf "%s %s %s\n" "Before you scream ${FMT_BOLD}${FMT_YELLOW}Oh My Zsh!${FMT_RESET} look over the" \
+    "$(fmt_code "$(fmt_link ".zshrc" "file://$zdot/.zshrc" --text)")" \
+    "file to select plugins, themes, and options."
+  printf '\n'
+  printf '%s\n' "• Follow us on X: $(fmt_link @ohmyzsh https://x.com/ohmyzsh)"
+  printf '%s\n' "• Join our Discord community: $(fmt_link "Discord server" https://discord.gg/ohmyzsh)"
+  printf '%s\n' "• Get stickers, t-shirts, coffee mugs and more: $(fmt_link "CommitGoods Shop" https://commitgoods.com/collections/oh-my-zsh)"
+  printf '%s\n' $FMT_RESET
+}
+
+main() {
+  # Run as unattended if stdin is not a tty
+  if [ ! -t 0 ]; then
+    RUNZSH=no
+    CHSH=no
+    OVERWRITE_CONFIRMATION=no
+  fi
+
+  # Parse arguments
+  while [ $# -gt 0 ]; do
+    case $1 in
+      --unattended) RUNZSH=no; CHSH=no; OVERWRITE_CONFIRMATION=no ;;
+      --skip-chsh) CHSH=no ;;
+      --keep-zshrc) KEEP_ZSHRC=yes ;;
+    esac
+    shift
+  done
+
+  if [ -d "$ZSH" ]; then
+    echo "${FMT_WHITE}[${FMT_YELLOW}!${FMT_WHITE}] ${FMT_LIGHT_CYAN}The pirate already installed.${FMT_RESET}"
+    if [ "$custom_zsh" = yes ]; then
+      echo
+    else
+      echo ""
+    fi
+    exit 1
+  fi
+
+  # Create ZDOTDIR folder structure if it doesn't exist
+  if [ -n "$ZDOTDIR" ]; then
+    mkdir -p "$ZDOTDIR"
+  fi
+
+  setup_ohmyzsh
+  setup_zshrc
+  setup_shell
+
+
+  if [ $RUNZSH = no ]; then
+    echo "${FMT_YELLOW}Run zsh to try it out.${FMT_RESET}"
+    exit
+  fi
+
+  exec zsh -l
+}
+
+
+main "$@"
