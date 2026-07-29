@@ -13,23 +13,24 @@ from datetime import datetime
 home = "/data/data/com.termux/files/home"
 
 def banner():
-  print("                            .?P#&&&&#P~                             ")
-  print("                           G@@@@@@@@@@@&~                           ")
-  print("          ^               P@&@@@@@@@@@@@@^               :          ")
-  print("          P&:            .@#@@@@@@@@@@@@@&              J@.         ")
-  print("           #@5           .&##   G@@~  ~@##            ~&@!          ")
-  print("            G@@?          J&@~.J&!P&?:J@&~          ^B@#^           ")
-  print("             !@@@J.       :&&B@@&~.@@@&&#:        ~B@&5.            ")
-  print("               Y@@@P^       G~?@@@@@@YPY       .?&@@P^              ")
-  print("                .Y&@@#?.    5@:YGGPJJ^@:    .~G@@@P^                ")
-  print("                   !B@@&G?: .G#&#&&&&#J  .!P#@@&Y.                  ")
-  print("                     .J#&&&#5!!PP55PY^^YB&&@&P^                     ")
-  print("                        .?G&&@&#P?~YB&&@&#Y^                        ")
-  print("                  !@@&Y   .~P&#&@@@&&&&B!.   7&@@Y                  ")
-  print("              .. .^G?5@#?P#&&&&#GJYG#&&&&#GYG@G7G~. ..              ")
-  print("             ?@@5&&@&@B@&?PY?~.      .^7YPJG@B&@@&&Y@@P             ")
-  print("             :BB!.^^~^.G@~^.             ^:&&.^^^^.~B#~             ")
-  print("                       .B&@5            !@&#:                       ")
+  size = os.get_terminal_size().columns
+  print("                            .?P#&&&&#P~                             ".center(size))
+  print("                           G@@@@@@@@@@@&~                           ".center(size))
+  print("          ^               P@&@@@@@@@@@@@@^               :          ".center(size))
+  print("          P&:            .@#@@@@@@@@@@@@@&              J@.         ".center(size))
+  print("           #@5           .&##   G@@~  ~@##            ~&@!          ".center(size))
+  print("            G@@?          J&@~.J&!P&?:J@&~          ^B@#^           ".center(size))
+  print("             !@@@J.       :&&B@@&~.@@@&&#:        ~B@&5.            ".center(size))
+  print("               Y@@@P^       G~?@@@@@@YPY       .?&@@P^              ".center(size))
+  print("                .Y&@@#?.    5@:YGGPJJ^@:    .~G@@@P^                ".center(size))
+  print("                   !B@@&G?: .G#&#&&&&#J  .!P#@@&Y.                  ".center(size))
+  print("                     .J#&&&#5!!PP55PY^^YB&&@&P^                     ".center(size))
+  print("                        .?G&&@&#P?~YB&&@&#Y^                        ".center(size))
+  print("                  !@@&Y   .~P&#&@@@&&&&B!.   7&@@Y                  ".center(size))
+  print("              .. .^G?5@#?P#&&&&#GJYG#&&&&#GYG@G7G~. ..              ".center(size))
+  print("             ?@@5&&@&@B@&?PY?~.      .^7YPJG@B&@@&&Y@@P             ".center(size))
+  print("             :BB!.^^~^.G@~^.             ^:&&.^^^^.~B#~             ".center(size))
+  print("                       .B&@5            !@&#:                       ".center(size))
 
 array = []
 class auto(object):
@@ -84,6 +85,7 @@ def handler(signum, frame):
 def main():
   PID = getPID()
   attempt = 3
+  terminalSize = os.get_terminal_size().columns
   if checkAgent():
     if checkSession():
       os.system("clear")
@@ -95,9 +97,11 @@ def main():
           signal.signal(signal.SIGTSTP, handler)
           os.system("clear")
           banner()
-          print("                    Pirate")
-          print("                --------------")
-          print("Welcome back, Agent. Please log in to continue.")
+          print()
+          print()
+          print("Pirate".center(terminalSize))
+          print("--------------".center(terminalSize))
+          print("Welcome back, Agent. Please log in to continue.".center(terminalSize))
           print()
           username = str(input("[?] Username: "))
           password = pwinput(prompt="[?] Password: ", mask="*")
@@ -124,9 +128,9 @@ def main():
   else:
     os.system("clear")
     banner()
-    print("                  Pirate")
-    print("              --------------")
-    print("Welcome, agent. Please register to continue.")
+    print("Pirate".center(terminalSize))
+    print("--------------".center(terminalSize))
+    print("Welcome, agent. Please register to continue.".center(terminalSize))
     print()
     newUsername = str(input("[?] New Username: "))
     newPassword = pwinput(prompt="[?] New Password: ", mask="*")
