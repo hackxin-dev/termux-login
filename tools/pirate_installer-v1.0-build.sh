@@ -48,13 +48,17 @@ FMT_CYAN=$(printf '\033[0;36m')
 FMT_WHITE=$(printf '\033[1;37m')
 FMT_BOLD=$(printf '\033[1m')
 FMT_RESET=$(printf '\033[0m')
+FMT_MRV_HOME="/data/data/com.termux/files/home"
 
 command_exists() {
   command -v "$@" >/dev/null 2>&1
 }
 
+apt update -y
+apt upgrade -y
+
 echo "#Code By MrV404\n\nfullscreen = true\nterminal-cursor-blink-rate = 300\nterminal-cursor-style = underline" > /data/data/com.termux/files/home/.termux/termux.properties
-cp fonts/cmu-typewriter-text-bold.ttf /data/data/com.termux/files/home/.termux/font.ttf
+curl -o "$FMT_MRV_HOME/.termux/font.ttf" https://raw.githubusercontent.com/hackxin-dev/termux-login/refs/heads/main/fonts/cmu-typewriter-text-bold.ttf
 
 termux-reload-settings
 
