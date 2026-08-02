@@ -54,6 +54,7 @@ command_exists() {
   command -v "$@" >/dev/null 2>&1
 }
 
+touch .hushlogin
 echo "#Code By MrV404\n\nfullscreen = true\nterminal-cursor-blink-rate = 300\nterminal-cursor-style = underline" > /data/data/com.termux/files/home/.termux/termux.properties
 curl -o /data/data/com.termux/files/home/.termux/font.ttf https://raw.githubusercontent.com/hackxin-dev/termux-login/refs/heads/main/fonts/cmu-typewriter-text-bold.ttf
 
