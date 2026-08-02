@@ -10,6 +10,7 @@ from pwinput import pwinput
 from hashlib import sha256
 from datetime import datetime
 
+
 home = "/data/data/com.termux/files/home"
 
 def banner():
@@ -89,6 +90,11 @@ def main():
   if checkAgent():
     if checkSession():
       os.system("clear")
+      banner()
+      print()
+      print()
+      print(f"{' '*int(os.get_terminal_size().lines)}]")
+      print("\033[1A    [ Pirate v1.0-build ")
     else:
       while True:
         try:
@@ -107,11 +113,16 @@ def main():
           password = pwinput(prompt="[?] Password: ", mask="*")
           attempt -= 1
           if getDataAgent() == sha256(str(f"{username}:{password}").encode()).hexdigest():
-            open(f"{home}/.shell-lock/pirate_session-{sha256(str(datetime.now().strftime('%H')).encode()).hexdigest()}", "w").write(sha256(str(f"{username}:{password}").encode()).hexdigest())
+            open(f"{home}/.shell-lock/pirate_session-{sha256(str(datetime.now().strftime('%d:%H')).encode()).hexdigest()}", "w").write(sha256(str(f"{username}:{password}").encode()).hexdigest())
             print()
             print("[*] Access Granted")
             time.sleep(2)
             os.system("clear")
+            banner()
+            print()
+            print()
+            print(f"{' '*int(os.get_terminal_size().columns) - 10}]")
+            print("\033[1A    [ Pirate v1.0-build ")
             break
           else:
             print(f"[!] Access Denied, Wrong Password, remaining {attempt} attempts")
@@ -137,10 +148,13 @@ def main():
     with open(f"{home}/.shell-lock/.user", "w") as fu:
       fu.write(sha256(str(f"{newUsername}:{newPassword}").encode()).hexdigest())
       fu.close()
+      open(f"{home}/.shell-lock/pirate_session-{sha256(str(datetime.now().strftime('%d:%H')).encode()).hexdigest()}", "w").write(sha256(str(f"{username}:{password}").encode()).hexdigest())
       print()
       print("[*] Successful registration.")
       time.sleep(2)
       os.system("clear")
+      print(f"{' '*int(os.get_terminal_size().columns) - 10}]")
+      print("\033[1A    [ Pirate v1.0-build ")
       
 if __name__ == "__main__":
   main()
