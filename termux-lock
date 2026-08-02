@@ -148,7 +148,7 @@ def main():
     with open(f"{home}/.shell-lock/.user", "w") as fu:
       fu.write(sha256(str(f"{newUsername}:{newPassword}").encode()).hexdigest())
       fu.close()
-      open(f"{home}/.shell-lock/pirate_session-{sha256(str(datetime.now().strftime('%d:%H')).encode()).hexdigest()}", "w").write(sha256(str(f"{username}:{password}").encode()).hexdigest())
+      open(f"{home}/.shell-lock/pirate_session-{sha256(str(datetime.now().strftime('%d:%H')).encode()).hexdigest()}", "w").write(sha256(str(f"{newUsername}:{newPassword}").encode()).hexdigest())
       print()
       print("[*] Successful registration.")
       time.sleep(2)
