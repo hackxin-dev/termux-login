@@ -163,6 +163,7 @@ else
     mkdir -p "$FMT_HOME/.config/neofetch"
     wget -q -O "$FMT_HOME/.config/neofetch/config.conf" https://raw.githubusercontent.com/hackxin-dev/termux-login/refs/heads/main/config/config.conf
     printf "    ${FMT_CYAN}Setting up neofetch done."
+  fi
 fi
 
 
