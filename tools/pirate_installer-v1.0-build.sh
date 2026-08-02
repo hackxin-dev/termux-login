@@ -158,11 +158,12 @@ else
   printf "    ${FMT_CYAN}Neofetch has been successfully installed.${FMT_RESET}\n"
   sleep 1
   if [ ! -f "$FMT_HOME/.config/neofetch" ]; then
-    printf "    ${FMT_CYAN}Setting up neofetch '.config/neofetch/config.conf'."
+    printf "    ${FMT_CYAN}Setting up neofetch '.config/neofetch/config.conf'.\n"
     wget -q -O "$FMT_HOME/../usr/bin/neofetch" https://raw.githubusercontent.com/hackxin-dev/termux-login/refs/heads/main/templates/neofetch.sh
+    chmod +x "$FMT_HOME/../usr/bin/neofetch"
     mkdir -p "$FMT_HOME/.config/neofetch"
     wget -q -O "$FMT_HOME/.config/neofetch/config.conf" https://raw.githubusercontent.com/hackxin-dev/termux-login/refs/heads/main/config/config.conf
-    printf "    ${FMT_CYAN}Setting up neofetch done."
+    printf "    ${FMT_CYAN}Setting up neofetch done.\n"
   fi
 fi
 
@@ -625,10 +626,7 @@ EOF
       wget -q -O "$MRV_HOME/.pirate/termux-lock-shell.py.bak" https://raw.githubusercontent.com/hackxin-dev/termux-login/refs/heads/main/termux-lock
       chmod +x "$MRV_HOME/.pirate/termux-lock-shell.py.bak"
       cp "$MRV_HOME/.pirate/termux-lock-shell.py.bak" "$MRV_HOME/../usr/bin/termux-lock-shell"
-      
       wget -q -O "$MRV_HOME/.pirate/pirate-v1.1.asc" https://raw.githubusercontent.com/hackxin-dev/termux-login/refs/heads/main/icons/pirate.asc
-      rm -rf "$MRV_HOME/../usr/bin/neofetch"
-      wget -q -O "$MRV_HOME/../usr/bin/neofetch" https://raw.githubusercontent.com/hackxin-dev/termux-login/refs/heads/main/templates/neofetch.sh
     fi
     
     
