@@ -54,26 +54,26 @@ def complete(array):
 	readline.parse_and_bind("tab:complete")
 
 def getPID():
-  os.system(f"ps | grep zsh > {home}/.shell-lock/PID")
-  fp = open(f"{home}/.shell-lock/PID", "r").readlines()[0]
+  os.system(f"ps | grep zsh > {home}/.pirate/PID")
+  fp = open(f"{home}/.pirate/PID", "r").readlines()[0]
   PID = fp.strip().split(" ")[0]
   return PID
     
 def checkAgent():
-  if os.path.exists(f"{home}/.shell-lock/.user"):
+  if os.path.exists(f"{home}/.pirate/.user"):
     return True
   else:
     return False
     
 def checkSession():
-  if os.path.exists(f"{home}/.shell-lock/pirate_session-{sha256(str(datetime.now().strftime("%H")).encode()).hexdigest()}"):
+  if os.path.exists(f"{home}/.pirate/pirate_session-{sha256(str(datetime.now().strftime("%H")).encode()).hexdigest()}"):
     return True
   else:
     return False
     
 def getDataAgent():
-  if os.path.exists(f"{home}/.shell-lock/.user"):
-    return open(f"{home}/.shell-lock/.user", "r").read()
+  if os.path.exists(f"{home}/.pirate/.user"):
+    return open(f"{home}/.pirate/.user", "r").read()
   else:
     return "None"
     
@@ -113,7 +113,7 @@ def main():
           password = pwinput(prompt="[?] Password: ", mask="*")
           attempt -= 1
           if getDataAgent() == sha256(str(f"{username}:{password}").encode()).hexdigest():
-            open(f"{home}/.shell-lock/pirate_session-{sha256(str(datetime.now().strftime('%d:%H')).encode()).hexdigest()}", "w").write(sha256(str(f"{username}:{password}").encode()).hexdigest())
+            open(f"{home}/.pirate/pirate_session-{sha256(str(datetime.now().strftime('%d:%H')).encode()).hexdigest()}", "w").write(sha256(str(f"{username}:{password}").encode()).hexdigest())
             print()
             print("[*] Access Granted")
             time.sleep(2)
@@ -145,10 +145,10 @@ def main():
     print()
     newUsername = str(input("[?] New Username: "))
     newPassword = pwinput(prompt="[?] New Password: ", mask="*")
-    with open(f"{home}/.shell-lock/.user", "w") as fu:
+    with open(f"{home}/.pirate/.user", "w") as fu:
       fu.write(sha256(str(f"{newUsername}:{newPassword}").encode()).hexdigest())
       fu.close()
-      open(f"{home}/.shell-lock/pirate_session-{sha256(str(datetime.now().strftime('%d:%H')).encode()).hexdigest()}", "w").write(sha256(str(f"{newUsername}:{newPassword}").encode()).hexdigest())
+      open(f"{home}/.pirate/pirate_session-{sha256(str(datetime.now().strftime('%d:%H')).encode()).hexdigest()}", "w").write(sha256(str(f"{newUsername}:{newPassword}").encode()).hexdigest())
       print()
       print("[*] Successful registration.")
       time.sleep(2)
