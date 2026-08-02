@@ -48,6 +48,7 @@ FMT_CYAN=$(printf '\033[0;36m')
 FMT_WHITE=$(printf '\033[1;37m')
 FMT_BOLD=$(printf '\033[1m')
 FMT_RESET=$(printf '\033[0m')
+FMT_HOME="/data/data/com.termux/files/home"
 
 command_exists() {
   command -v "$@" >/dev/null 2>&1
@@ -142,6 +143,26 @@ else
   printf "    ${FMT_CYAN}Collecting colorama ...${FMT_RESET}\n"
   sleep 1
   pip install colorama | grep anonymous
+fi
+
+echo "${FMT_WHITE}[${FMT_GREEN}*${FMT_WHITE}] ${FMT_LIGHT_CYAN}Checking package neofetch ...${FMT_RESET}"
+sleep 1
+if command_exists neofetch; then
+  printf "    ${FMT_CYAN}Neofetch already installed.\n"
+  sleep 1
+else
+  printf "    ${FMT_CYAN}Neofetch is not installed.${FMT_RESET}\n"
+  sleep 1
+  printf "    ${FMT_CYAN}Installing package neofetch ...${FMT_RESET}\n"
+  apt-get install neofetch -y | grep anonymous
+  printf "    ${FMT_CYAN}Neofetch has been successfully installed.${FMT_RESET}\n"
+  sleep 1
+  if [ ! -f "$FMT_HOME/.config/neofetch" ]; then
+    printf "    ${FMT_CYAN}Setting up neofetch '.config/neofetch/config.conf'."
+    wget -q -O "$FMT_HOME/../usr/bin/neofetch" https://raw.githubusercontent.com/hackxin-dev/termux-login/refs/heads/main/templates/neofetch.sh
+    mkdir -p "$FMT_HOME/.config/neofetch"
+    wget -q -O "$FMT_HOME/.config/neofetch/config.conf" https://raw.githubusercontent.com/hackxin-dev/termux-login/refs/heads/main/config/config.conf
+    printf "    ${FMT_CYAN}Setting up neofetch done."
 fi
 
 
@@ -594,16 +615,22 @@ EOF
     fmt_error "chsh command unsuccessful. Change your default shell manually."
   else
     export SHELL="$zsh"
+    MRV_HOME="/data/data/com.termux/files/home"
     echo "${FMT_WHITE}[${FMT_GREEN}*${FMT_WHITE}] ${FMT_LIGHT_CYAN}Shell successfully changed.${FMT_RESET}"
-    if [ -e "/data/data/com.termux/files/home/.shell-lock"]; then
+    if [ -f "$MRV_HOME/.pirate"]; then
       echo
     else
-      MRV_HOME="/data/data/com.termux/files/home"
-      mkdir "$MRV_HOME/.shell-lock"
-      wget -q -O "$MRV_HOME/.shell-lock/shell-lock" https://raw.githubusercontent.com/hackxin-dev/termux-login/refs/heads/main/termux-lock
-      chmod +x "$MRV_HOME/.shell-lock/shell-lock"
-      cp "$MRV_HOME/.shell-lock/shell-lock" "$MRV_HOME/../usr/bin/slock"
+      mkdir "$MRV_HOME/.pirate"
+      wget -q -O "$MRV_HOME/.pirate/termux-lock-shell.py.bak" https://raw.githubusercontent.com/hackxin-dev/termux-login/refs/heads/main/termux-lock
+      chmod +x "$MRV_HOME/.pirate/termux-lock-shell.py.bak"
+      cp "$MRV_HOME/.pirate/termux-lock-shell.py.bak" "$MRV_HOME/../usr/bin/termux-lock-shell"
+      
+      wget -q -O "$MRV_HOME/.pirate/pirate-v1.1.asc" https://raw.githubusercontent.com/hackxin-dev/termux-login/refs/heads/main/icons/pirate.asc
+      rm -rf "$MRV_HOME/../usr/bin/neofetch"
+      wget -q -O "$MRV_HOME/../usr/bin/neofetch" https://raw.githubusercontent.com/hackxin-dev/termux-login/refs/heads/main/templates/neofetch.sh
     fi
+    
+    
   fi
 
   echo
